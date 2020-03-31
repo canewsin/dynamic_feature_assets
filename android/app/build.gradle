@@ -24,6 +24,7 @@ if (flutterVersionName == null) {
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
+apply plugin: 'com.jeppeman.locallydynamic'
 
 android {
     compileSdkVersion 28
@@ -52,6 +53,13 @@ android {
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig signingConfigs.debug
         }
+
+        debug {
+            locallyDynamic {
+                enabled = true
+                throttleDownloadBy = 1000
+            }
+        }
     }
     dynamicFeatures = [":common", ":arm64", ":arm", ":x86", ":x86_64"]
 
@@ -67,4 +75,10 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
+
+    // The debug artifact will talk to the LocallyDynamic server
+    debugImplementation 'com.jeppeman.locallydynamic:locallydynamic-debug:0.3'
+
+    // The release artifact will only delegate to the Play Core library
+    releaseImplementation 'com.jeppeman.locallydynamic:locallydynamic:0.3'
 }
