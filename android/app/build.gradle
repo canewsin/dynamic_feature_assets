@@ -61,7 +61,7 @@ android {
             }
         }
     }
-    dynamicFeatures = [":common", ":arm64", ":arm", ":x86", ":x86_64"]
+    dynamicFeatures = [":common", ":arm64", ":arm", ":x86", ":x86_64", ":dynamicfeature"]
 
 
 }
