@@ -2,6 +2,7 @@ package `in`.canews.dynamic_feature_assets
 
 import android.os.Build
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.os.PersistableBundle
 import android.util.Log
 import androidx.annotation.NonNull;
@@ -13,6 +14,9 @@ import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugins.GeneratedPluginRegistrant
+import java.util.*
+import java.util.logging.StreamHandler
+import kotlin.collections.HashMap
 
 class MainActivity : FlutterActivity() {
 
@@ -26,14 +30,26 @@ class MainActivity : FlutterActivity() {
     }
 
     override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
-        GeneratedPluginRegistrant.registerWith(flutterEngine);
+        GeneratedPluginRegistrant.registerWith(flutterEngine)
+        EventChannel(flutterEngine.dartExecutor,"moduleInstall").setStreamHandler(
+                object : EventChannel.StreamHandler {
+                    override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
+                        loadAndLaunchModule("arm64",events);
+                    }
+
+                    override fun onCancel(arguments: Any?) {
+
+                    }
+
+                }
+        )
     }
 
     /**
      * Load a feature by module name.
      * @param name The name of the feature module to load.
      */
-    private fun loadAndLaunchModule(name: String, eventSink: EventChannel.EventSink) {
+    private fun loadAndLaunchModule(name: String, eventSink: EventChannel.EventSink?) {
         if (isModuleInstalled(name) == true)
             return
         val request = SplitInstallRequest.newBuilder()
@@ -56,7 +72,7 @@ class MainActivity : FlutterActivity() {
                         map["downloaded"] = downloaded
                         map["total"] = total
                         Log.d("MainActivity>Download:", "\n\n" + map.toMap() + "\n\n")
-                        eventSink.success(map)
+                        eventSink?.success(map)
                     }
                     SplitInstallSessionStatus.REQUIRES_USER_CONFIRMATION -> {
                         Log.d("MainActivity>LoadModule", "\n\n" + "SplitInstallSessionStatus.REQUIRES_USER_CONFIRMATION" + "\n\n")
